@@ -16,7 +16,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: '17'
 
       - name: Set up Flutter
@@ -25,15 +25,15 @@ jobs:
           flutter-version: '3.19.6'
           channel: 'stable'
 
-      - name: Create Basic Android Files
+      - name: Initialize Android Structure
         run: |
-          flutter create --platforms=android .
+          flutter create --platforms=android --org com.jyotishvastu.ayurveda .
 
-      - name: Get Dependencies
+      - name: Install Dependencies
         run: flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --release
+      - name: Build Release APK
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
