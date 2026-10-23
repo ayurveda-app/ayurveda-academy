@@ -19,26 +19,35 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Flutter 3.19.6
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.6'
           channel: 'stable'
 
-      - name: Create Standalone Working App
+      - name: Build Android App Cleanly
         run: |
-          mkdir build_workspace
-          cd build_workspace
+          mkdir -p workspace
+          cd workspace
           flutter create --org com.jyotishvastu.ayurveda --project-name ayurveda_academy app
           cp -f ../pubspec.yaml app/pubspec.yaml
           cp -f ../lib/main.dart app/lib/main.dart
           cd app
+
+          # Android Settings व आवश्यक प्लगइन सपोर्ट जोडणे
+          echo "android.useAndroidX=true" >> android/gradle.properties
+          echo "android.enableJetifier=true" >> android/gradle.properties
+
           sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' android/app/build.gradle || true
           sed -i 's/minSdkVersion [0-9]*/minSdkVersion 21/g' android/app/build.gradle || true
+          sed -i 's/compileSdkVersion = flutter.compileSdkVersion/compileSdkVersion = 34/g' android/app/build.gradle || true
+
           chmod +x android/gradlew
+
           flutter pub get
-          flutter build apk --release --no-tree-shake-icons
-          cp build/app/outputs/flutter-apk/app-release.apk ../../ayurveda-app.apk
+          flutter build apk --debug
+
+          cp build/app/outputs/flutter-apk/app-debug.apk ../../ayurveda-app.apk
 
       - name: Upload APK File
         uses: actions/upload-artifact@v4
