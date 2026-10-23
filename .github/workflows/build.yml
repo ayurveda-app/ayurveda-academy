@@ -25,15 +25,17 @@ jobs:
           flutter-version: '3.19.6'
           channel: 'stable'
 
-      - name: Recreate Android Project Scaffold
+      - name: Generate Android Scaffold
         run: |
-          flutter create --platforms=android --org com.jyotishvastu.ayurveda --overwrite .
+          flutter create --platforms=android --project-name=ayurveda_academy temp_app
+          cp -r temp_app/android ./android
+          rm -rf temp_app
 
       - name: Get Dependencies
         run: flutter pub get
 
-      - name: Build APK Without Minification
-        run: flutter build apk --release --no-shrink --no-tree-shake-icons
+      - name: Build APK
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
