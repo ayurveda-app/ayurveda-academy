@@ -25,20 +25,23 @@ jobs:
           flutter-version: '3.19.6'
           channel: 'stable'
 
-      - name: Generate Fresh Project & Merge
+      - name: Create Standalone Working App
         run: |
-          cd ..
-          flutter create --org com.jyotishvastu.ayurveda ayurveda_app
-          cp -f ayurveda-academy/pubspec.yaml ayurveda_app/
-          cp -f ayurveda-academy/lib/main.dart ayurveda_app/lib/main.dart
-          cd ayurveda_app
+          mkdir build_workspace
+          cd build_workspace
+          flutter create --org com.jyotishvastu.ayurveda --project-name ayurveda_academy app
+          cp -f ../pubspec.yaml app/pubspec.yaml
+          cp -f ../lib/main.dart app/lib/main.dart
+          cd app
           sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' android/app/build.gradle || true
+          sed -i 's/minSdkVersion [0-9]*/minSdkVersion 21/g' android/app/build.gradle || true
+          chmod +x android/gradlew
           flutter pub get
           flutter build apk --release --no-tree-shake-icons
-          cp build/app/outputs/flutter-apk/app-release.apk ../ayurveda-academy/
+          cp build/app/outputs/flutter-apk/app-release.apk ../../ayurveda-app.apk
 
       - name: Upload APK File
         uses: actions/upload-artifact@v4
         with:
           name: Ayurveda_Academy_App
-          path: app-release.apk
+          path: ayurveda-app.apk
